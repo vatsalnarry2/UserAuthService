@@ -2,10 +2,13 @@ package com.example.authenticationservice.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.authenticationservice.exceptions.UserAlreadyExistException;
+import com.example.authenticationservice.exceptions.UserNotRegisteredException;
 import com.example.authenticationservice.models.Role;
 import com.example.authenticationservice.models.User;
 import com.example.authenticationservice.repo.UserRepo;
@@ -16,8 +19,15 @@ public class AuthService implements IAuthService {
 	UserRepo userRepo;
 	
 	@Override
-	public User signUp(String email, String password) {
+	public User signUp(String email, String password) throws UserAlreadyExistException {
 		
+		
+		Optional<User>   userOptional = userRepo.findByEmail(email);
+		
+		if(!userOptional.isEmpty())
+		{
+			 throw new UserAlreadyExistException("Please try logging ");
+		}
 		Role role = new Role();
 		role.setValue("Customer");
 		List<Role> roles = new ArrayList<Role>();
@@ -33,9 +43,13 @@ public class AuthService implements IAuthService {
 	}
 
 	@Override
-	public User login(String userName, String password) {
-		// TODO Auto-generated method stub
-		return null;
+	public User login(String email, String password) throws UserNotRegisteredException {
+		Optional<User>   userOptional = userRepo.findByEmail(email);
+		if(userOptional.isEmpty())
+		{
+			 throw new UserNotRegisteredException("Please sing up first");
+		}
+		return userOptional.get();
 	}
 
 }

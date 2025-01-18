@@ -12,6 +12,7 @@ import com.example.authenticationservice.dtos.LoginRequest;
 import com.example.authenticationservice.dtos.SignUpRequest;
 import com.example.authenticationservice.dtos.UserDto;
 import com.example.authenticationservice.exceptions.UserAlreadyExistException;
+import com.example.authenticationservice.exceptions.UserNotRegisteredException;
 import com.example.authenticationservice.models.User;
 import com.example.authenticationservice.service.IAuthService;
 
@@ -42,14 +43,16 @@ public class AuthencationController {
 		return userDto;
 	}
 
-	@PostMapping
+	@PostMapping("/login")
 	public ResponseEntity<UserDto> login(@RequestBody LoginRequest loginRequest)
 	{
 		try {
 			
-		} catch (Exception e) {
-			
+			User user =authService.login(loginRequest.getEmail(), loginRequest.getPassword());
+			return new ResponseEntity<>(from(user),HttpStatus.OK);
+		} catch (UserNotRegisteredException e) {
+			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 		}
-		return null;}
+	}
 
 }
